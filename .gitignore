@@ -1,0 +1,56 @@
+# 🔐 Environment variables
+.env
+.env.*
+!.env.example
+
+# 📦 Node modules
+node_modules/
+
+# 🧾 Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 🗂️ Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# 🧪 Coverage reports
+coverage/
+
+# 🛠️ Build files
+dist/
+build/
+
+# 🧠 OS files
+.DS_Store
+Thumbs.db
+
+# 💻 Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 🔥 Optional: local config files
+config/local.json
+
+# 📡 ESP / Arduino compiled files (if any)
+*.bin
+*.hex
+*.elf
+
+# 🧬 MongoDB local dumps (if you ever export)
+dump/
+*.archive
+
+# 📁 Temporary files
+tmp/
+temp/
+
+# 🚀 Render / deployment artifacts (if any)
+.render/
