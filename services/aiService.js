@@ -23,7 +23,7 @@ const getSummary = async (text) => {
     }
 
     const data = await response.json();
-    return data.choices?.[0]?.messages?.content?.trim() || "";
+    return data.choices?.[0]?.message?.content?.trim() || "";
 }
 
 module.exports = {
