@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { generateAccessToken, generateRefreshToken } = require("../utility/token");
 const tokenModel = require("../models/tokenModel");
+const { hashToken } = require("../utility/token");
 
 
 // register controller
@@ -66,6 +67,7 @@ const login = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
         return res.status(200).json({ 
@@ -145,7 +147,7 @@ const logout = async (req, res) => {
             await tokenModel.deleteOne({ tokenHash: hashToken(token)});
         }
 
-        res.clearcookie("refreshToken", {
+        res.clearCookie("refreshToken", {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "strict"

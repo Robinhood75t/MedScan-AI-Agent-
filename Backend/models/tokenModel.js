@@ -21,7 +21,7 @@ const tokenSchema = new mongoose.Schema({
     }
 });
 
-tokenSchema.index({ expiresAt: 1}, {expiresAfterSeconds: 0});
+tokenSchema.index({ expiresAt: 1}, {expireAfterSeconds: 0});
 
 const Token = mongoose.model("Token", tokenSchema);
 

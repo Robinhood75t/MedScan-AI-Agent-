@@ -32,6 +32,4 @@ const getSummary = async (text) => {
 
 }
 
-module.exports = {
-    getSummary
-}
+module.exports = getSummary;

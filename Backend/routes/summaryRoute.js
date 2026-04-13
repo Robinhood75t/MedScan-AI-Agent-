@@ -5,8 +5,6 @@ const summarize = require("../controllers/summayController");
 const upload = require("../middleware/uploadMiddleware");
 const authMiddleware = require("../middleware/authMiddleware");
 
-router.use(authMiddleware);
-
 router.post("/summarize", authMiddleware, upload.single("file"), summarize);
 
 module.exports = router;

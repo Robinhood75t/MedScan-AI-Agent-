@@ -7,7 +7,8 @@ require("./config/env");
 
 dotenv.config();
 app.use(cors({
-    origin: "http://localhost:8080"
+    origin: process.env.CLIENT_URL,
+    credentials: true
 }));
 
 connectDB();
