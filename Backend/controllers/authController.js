@@ -2,6 +2,7 @@ const userModel = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { generateAccessToken, generateRefreshToken } = require("../utility/token");
+const tokenModel = require("../models/tokenModel");
 
 
 // register controller
@@ -55,6 +56,12 @@ const login = async (req, res) => {
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
 
+        await tokenModel.create({
+            userId: user._id,
+            tokenHash: hashToken(refreshToken),
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        })
+
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
@@ -71,25 +78,90 @@ const login = async (req, res) => {
 }
 
 //refresh token controller
-const refresh = (req, res) => {
+const refresh = async (req, res) => {
+  try {
     const token = req.cookies.refreshToken;
 
-    if(!token){
-        return res.status(401).json({message: "no token provided"});
+    if (!token) {
+      return res.status(401).json({ message: "No refresh token provided" });
     }
-    try{
-        const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-        const userId = decoded.id;
 
-        const newAccessToken = generateAccessToken({ _id: userId});
-        res.json({ accessToken: newAccessToken });
+    // Step 1 — Verify the signature + expiry
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
     } catch (err) {
-        res.status(403).json({ message: "invalid token" });
+      return res.status(401).json({ message: "Invalid or expired refresh token" });
     }
-}
+
+    // Step 2 — Check if this token actually exists in DB (not revoked)
+    const storedToken = await tokenModel.findOne({
+      userId: decoded.id,
+      tokenHash: hashToken(token),
+    });
+
+    if (!storedToken) {
+      // Token was valid JWT but NOT in DB = reuse attack
+      // Nuke ALL sessions for this user as a safety measure
+      await tokenModel.deleteMany({ userId: decoded.id });
+      res.clearCookie("refreshToken");
+      return res.status(401).json({ message: "Token reuse detected. Please log in again." });
+    }
+
+    // Step 3 — Rotate: delete old token, issue a fresh pair
+    await tokenModel.deleteOne({ _id: storedToken._id });
+
+    const newAccessToken  = generateAccessToken({ _id: decoded.id });
+    const newRefreshToken = generateRefreshToken({ _id: decoded.id });
+
+    // Save new hashed refresh token
+    await tokenModel.create({
+      userId: decoded.id,
+      tokenHash: hashToken(newRefreshToken),
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+    });
+
+    // Rotate cookie
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({ accessToken: newAccessToken });
+
+  } catch (err) {
+    console.error("Refresh error:", err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const logout = async (req, res) => {
+    try{
+        const token = req.cookies.refreshToken;
+
+        if(token){
+            await tokenModel.deleteOne({ tokenHash: hashToken(token)});
+        }
+
+        res.clearcookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict"
+        });
+
+        return res.status(200).json({ message: "logout successful"});
+
+    }catch(err){
+        console.error("Logout error: ", err);
+        return res.status(500).json({ message: "internal server error"});
+    }
+};
 
 module.exports = {
     register,
     login,
-    refresh
+    refresh,
+    logout
 }
