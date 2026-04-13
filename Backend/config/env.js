@@ -1,6 +1,15 @@
-const dotenv = require("dotenv");
-dotenv.config();
+const required = [
+    "MONGODB_URI",
+    "ACCESS_TOKEN_SECRET",
+    "REFRESH_TOKEN_SECRET",
+    "PERPLEXITY_API_KEY",
+    "PERPLEXITY_API_URL",
+    "PORT",
+    "CLIENT_URL"
+];
 
-if (!process.env.PERPLEXITY_API_KEY) {
-    throw new Error("PERPLEXITY_API_KEY missing in .env");
-}
+required.forEach(key => {
+    if(!process.env[key]){
+        throw new Error(`Missing required env variable: ${key}`);
+    }
+});

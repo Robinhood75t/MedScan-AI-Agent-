@@ -17,7 +17,10 @@ const extractedTextFromFile = async(filePath, mimetype) => {
             const result = await Tesseract.recognize(filePath, "eng");
             return result.data.text;
         }
-    }finally{
+    }catch(err){
+        throw new Error("file processing error: " + err.message);
+    }
+    finally{
         // clean up the uploaded file
         await fs.unlink(filePath).catch((err) => {
             console.error(`file cleanup error: ${err.message}`);
