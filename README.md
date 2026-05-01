@@ -83,9 +83,11 @@ Backend processes and extracts data
 Data is sent to Perplexity API
 
 #### AI generates:
+
 Simple summary (Patient Mode)
 Detailed structured output (Doctor Mode)
 Output is displayed in selected language
+
 ---
 
 #### 📊 Current Status
@@ -93,6 +95,7 @@ Output is displayed in selected language
 🚧 Project is under development (50% complete)
 
 ##### Completed
+
 Basic backend setup (Node.js + Express)
 Frontend setup (React)
 Report upload functionality
@@ -102,14 +105,17 @@ Subscription system
 Authentication & user roles
 UI/UX improvements
 Multi-language optimization
+
 ---
 
 #### 🎯 Future Enhancements
+
 🧠 Advanced medical insights
 📈 Health tracking dashboard
 📱 Mobile app version
 🌍 More language support
 🔐 Secure report storage
+
 ---
 
 #### ⚠️ Disclaimer
