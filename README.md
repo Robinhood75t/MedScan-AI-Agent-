@@ -1,6 +1,7 @@
 # 🏥 MedScan AI Agent
 
-MedScan AI is an intelligent healthcare assistant that simplifies complex medical reports into easy-to-understand summaries. It helps patients interpret their reports without confusion and provides doctors with a structured overview for faster analysis.
+### MedScan AI is an intelligent healthcare assistant that simplifies complex medical reports into easy-to-understand summaries. It helps patients interpret their reports without confusion and provides doctors with a structured overview for faster analysis.
+
 ---
 
 ## 🚀 Project Overview
