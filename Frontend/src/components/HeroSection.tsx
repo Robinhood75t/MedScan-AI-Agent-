@@ -14,7 +14,7 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-[90vh] flex items-center pt-16 overflow-hidden">
-      <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${heroBg})` }} />
+      <div className="absolute inset-0 bg-cover bg-center opacity-100" style={{ backgroundImage: `url(${heroBg})` }} />
       <div className="absolute inset-0" style={{ background: "var(--hero-overlay)" }} />
 
       <div className="container relative mx-auto px-4 md:px-8 py-20 md:py-32">
