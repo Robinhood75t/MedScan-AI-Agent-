@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [scanHistory, setScanHistory] = useState<ScanRecord[]>([]);
 
   const login = async (email , password) => {
-    const res = await fetch("http://localhost:8000/api/login",{
+    const res = await fetch("http://localhost:8000/api/auth/login",{
       method: "POST",
       headers: {
         "Content-Type":"application/json"
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signup = async (email: string, password: string) => {
-    const res = await fetch("http://localhost:8000/api/register",{
+    const res = await fetch("http://localhost:8000/api/auth/register",{
       method: "POST",
       headers: {
         "Content-Type":"application/json"
