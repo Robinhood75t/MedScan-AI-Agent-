@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Camera, Upload, FileImage, X, ScanLine } from "lucide-react";
+import { Camera, Upload, FileImage, X, ScanLine, Loader2 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { useAuth, ScanRecord } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -9,13 +9,13 @@ import { toast } from "sonner";
 const Scan = () => {
   const [mode, setMode] = useState<"choose" | "camera" | "upload">("choose");
   const [file, setFile] = useState<File | null>(null);
-  const { addScanRecord } = useAuth();
   const [preview, setPreview] = useState<string | null>(null);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
+  const [scanning, setScanning] = useState(false); // ✅ loading state
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const { user, incrementScans } = useAuth();
+  const { user, incrementScans, addScanRecord } = useAuth();
 
   const startCamera = async () => {
     try {
@@ -68,37 +68,95 @@ const Scan = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const f = e.dataTransfer.files[0];
-    if (f) {
-      setFile(f);
-      if (f.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = () => setPreview(reader.result as string);
-        reader.readAsDataURL(f);
-      }
-      setMode("upload");
+    if (!f) return;
+    if (!f.type.startsWith("image/") && f.type !== "application/pdf") {
+      toast.error("Please upload an image or PDF file.");
+      return;
     }
+    setFile(f);
+    if (f.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = () => setPreview(reader.result as string);
+      reader.readAsDataURL(f);
+    }
+    setMode("upload");
   };
 
-  const handleScan = () => {
+  const handleScan = async () => {
     if (!file && !preview) {
       toast.error("Please upload or capture a report first.");
       return;
     }
-    // Check paywall
+
+    // ✅ paywall check
     if (user && user.scansUsed >= 1) {
       navigate("/pricing");
       return;
     }
-    incrementScans();
-    const record: ScanRecord = {
-      id: Date.now().toString(),
-      fileName: file?.name || "Camera Capture",
-      date: new Date().toLocaleDateString(),
-      overview: "CBC report analysis — mostly normal values with minor observations.",
-      status: "completed",
-    };
-    addScanRecord(record);
-    navigate("/results");
+
+    // ✅ build form data
+    let fileToUpload: File | null = file;
+
+    // if captured from camera (no file object, only base64 preview)
+    if (!fileToUpload && preview) {
+      const res = await fetch(preview);
+      const blob = await res.blob();
+      fileToUpload = new File([blob], "camera-capture.jpg", { type: "image/jpeg" });
+    }
+
+    if (!fileToUpload) {
+      toast.error("No file to upload.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", fileToUpload);
+
+    try {
+      setScanning(true);
+      const token = localStorage.getItem("accessToken");
+
+        if (!token) {
+            toast.error("Please login first.");
+            navigate("/login");
+            return;
+        }
+      const response = await fetch("http://localhost:8000/api/summary/summary", {
+          method: "POST",
+          headers: {
+              "Authorization": `Bearer ${token}`, // ✅ this is what your authMiddleware checks
+          },
+          body: formData, // ❌ do NOT add Content-Type here — FormData sets it automatically
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || "Something went wrong");
+      }
+
+      const data = await response.json();
+
+      // ✅ store result for Results page
+      sessionStorage.setItem("summaryResult", JSON.stringify(data.summary));
+
+      // ✅ update scan record
+      incrementScans();
+      const record: ScanRecord = {
+        id: Date.now().toString(),
+        fileName: fileToUpload.name,
+        date: new Date().toLocaleDateString(),
+        overview: data.summary?.overview || "Report analyzed successfully.",
+        status: "completed",
+      };
+      addScanRecord(record);
+
+      navigate("/results");
+
+    } catch (err: any) {
+      toast.error(err.message || "Failed to analyze report. Please try again.");
+    } finally {
+      setScanning(false);
+    }
   };
 
   const reset = () => {
@@ -184,11 +242,16 @@ const Scan = () => {
               ) : null}
 
               <div className="flex gap-3 justify-center">
-                <Button variant="outline" className="rounded-xl" onClick={reset}>
+                {/* ✅ disable buttons while scanning */}
+                <Button variant="outline" className="rounded-xl" onClick={reset} disabled={scanning}>
                   Choose Again
                 </Button>
-                <Button className="rounded-xl gap-2" onClick={handleScan}>
-                  <ScanLine className="w-4 h-4" /> Scan Now
+                <Button className="rounded-xl gap-2" onClick={handleScan} disabled={scanning}>
+                  {scanning ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing...</>
+                  ) : (
+                    <><ScanLine className="w-4 h-4" /> Scan Now</>
+                  )}
                 </Button>
               </div>
             </div>

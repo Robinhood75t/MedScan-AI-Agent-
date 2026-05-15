@@ -37,15 +37,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       headers: {
         "Content-Type":"application/json"
       },
+      credentials: "include",
       body: JSON.stringify({email,password})
     });
     const data = await res.json();
     if(!res.ok){
       throw new Error(data.message || "login failed");
     }
+    localStorage.setItem("accessToken", data.accessToken);
+
     setUser({
       email: data.email || email,
-      scansUsed: data.scanUsed
+      scansUsed: data.scansUsed || 0
     })
   };
 
@@ -55,6 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       headers: {
         "Content-Type":"application/json"
       },
+      credentials: "include",
       body: JSON.stringify({email,password})
     });
     const data = await res.json();
@@ -67,7 +71,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     })
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    localStorage.removeItem("accessToken"); // ✅ clear token on logout
+    setUser(null);
+};
 
   const incrementScans = () => {
     setUser((prev) => prev ? { ...prev, scansUsed: prev.scansUsed + 1 } : null);
