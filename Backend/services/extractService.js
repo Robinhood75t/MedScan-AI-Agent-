@@ -1,4 +1,4 @@
-const pdfParse = require("pdf-parser");
+const pdfParse = require("pdf-parse");
 const Tesseract = require("tesseract.js");
 const fs = require("fs/promises");
 
