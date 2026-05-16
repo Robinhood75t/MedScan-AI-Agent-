@@ -145,3 +145,6 @@ https://www.youtube.com/@robinhood75t
 If you like this project, consider giving it a ⭐ on GitHub — it helps a lot!
 
 #### Coming Soon features - 
+1. Pricing
+2. Download as PDF
+3. Get PrintOut
