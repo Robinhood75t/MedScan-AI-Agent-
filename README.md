@@ -149,7 +149,7 @@ If you like this project, consider giving it a ⭐ on GitHub — it helps a lot!
 2. Download as PDF
 3. Get PrintOut
 4. Our Own Generative AI
-5. Offers and Limited Deals
+
 
 
 
