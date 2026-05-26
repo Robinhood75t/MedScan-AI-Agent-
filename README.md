@@ -19,7 +19,7 @@ Extract and process medical data efficiently
 
 #### 🤖 AI-Powered Summarization
 
-Uses Perplexity API for intelligent summarization
+Uses Google Gemini API for intelligent summarization
 Converts complex medical jargon into simple explanations
 
 #### 🌐 Multi-language Support
