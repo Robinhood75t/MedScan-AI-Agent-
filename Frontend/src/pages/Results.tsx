@@ -300,9 +300,13 @@ const Results = () => {
 
           {/* Actions */}
           <div className="flex flex-wrap gap-3 justify-center">
+
+// this is the line to download as pdf.
             <Button variant="outline" className="rounded-xl gap-2" onClick={() => toast("PDF download coming soon!")}>
-              <Download className="w-4 h-4" /> Download PDF
+              <Download className="w-4 h-4" /> Download PDF 
             </Button>
+
+
             <Button variant="outline" className="rounded-xl gap-2" onClick={() => window.print()}>
               <Printer className="w-4 h-4" /> Print Report
             </Button>
