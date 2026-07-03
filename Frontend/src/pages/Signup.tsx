@@ -22,7 +22,7 @@ const Signup = () => {
       toast.success("Account created successfully!");
       navigate("/scan");
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.error("User already exists. Please try to login.");
     } finally {
       setLoading(false);
     }
