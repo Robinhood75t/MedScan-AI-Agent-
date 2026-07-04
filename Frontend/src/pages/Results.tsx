@@ -147,6 +147,7 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import html2pdf from "html2pdf.js";
 
 // ✅ matches backend response shape exactly
 interface Finding {
@@ -160,6 +161,17 @@ interface SummaryResult {
   overview: string;
   findings: Finding[];
   recommendations: string[];
+}
+
+
+const downloadPDF = (result: summaryResult) => {
+  const element = document.getElementById("results-page");
+  if(!element){
+    toast.error("unable to find results page for pdf Download");
+    return;
+  }
+
+  html2pdf().from(element).save();
 }
 
 const Results = () => {
