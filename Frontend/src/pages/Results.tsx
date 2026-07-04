@@ -170,7 +170,6 @@ const Results = () => {
   const [error, setError, ] = useState<string | null>(null);
   const navigate = useNavigate();
   const reportRef = useRef<HTMLDivElement>(null);
-  const html2pdf = require("html2pdf.js");
 
   useEffect(() => {
     // ✅ progress bar animation
@@ -261,14 +260,9 @@ const Results = () => {
                         format: "a4",
                         orientation: "portrait"
                     },
-
-                    pagebreak: {
-                        mode: ["avoid-all", "css", "legacy"]
-                    }
-
-                })
-                .from(element)
-                .save();
+                  })
+                  .from(element)
+                  .save();
 
             toast.success("PDF downloaded.", {
                 id: "pdf"
