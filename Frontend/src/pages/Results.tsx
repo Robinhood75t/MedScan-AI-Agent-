@@ -354,6 +354,24 @@ const Results = () => {
           </div>
 
           {/* Actions */}
+          {/* <div className="flex flex-wrap gap-3 justify-center">
+
+
+            <Button variant="outline" className="rounded-xl gap-2" onClick={downloadPDF}>
+              <Download className="w-4 h-4" /> Download PDF 
+            </Button>
+
+
+            <Button variant="outline" className="rounded-xl gap-2" onClick={() => window.print()}>
+              <Printer className="w-4 h-4" /> Print Report
+            </Button>
+            <Button className="rounded-xl gap-2" onClick={() => navigate("/scan")}>
+              <ScanLine className="w-4 h-4" /> Scan Another
+            </Button>
+          </div> */}
+        </div>
+      </div>
+      {/* Actions */}
           <div className="flex flex-wrap gap-3 justify-center">
 
 
@@ -369,8 +387,6 @@ const Results = () => {
               <ScanLine className="w-4 h-4" /> Scan Another
             </Button>
           </div>
-        </div>
-      </div>
     </div>
   );
 };
