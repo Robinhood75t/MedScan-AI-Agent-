@@ -139,7 +139,7 @@
 // };
 
 // export default Results;
-import { useState, useEffect } from "react";
+import { useState, useEffect ,useRef} from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Download, Printer, ScanLine, CheckCircle2, AlertTriangle, Heart } from "lucide-react";
@@ -163,23 +163,14 @@ interface SummaryResult {
   recommendations: string[];
 }
 
-
-const downloadPDF = (result: summaryResult) => {
-  const element = document.getElementById("results-page");
-  if(!element){
-    toast.error("unable to find results page for pdf Download");
-    return;
-  }
-
-  html2pdf().from(element).save();
-}
-
 const Results = () => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<SummaryResult | null>(null); // ✅ real data
   const [error, setError, ] = useState<string | null>(null);
   const navigate = useNavigate();
+  const reportRef = useRef<HTMLDivElement>(null);
+  const html2pdf = require("html2pdf.js");
 
   useEffect(() => {
     // ✅ progress bar animation
@@ -235,6 +226,64 @@ const Results = () => {
     );
   }
 
+      // function to download the results page as a PDF
+    const downloadPDF = async () => {
+
+        const element = reportRef.current;
+
+        if (!element) {
+            toast.error("Unable to generate PDF.");
+            return;
+        }
+
+        toast.loading("Generating PDF...", {
+            id: "pdf"
+        });
+
+        try {
+
+            await html2pdf()
+                .set({
+                    margin: 10,
+                    filename: "MedScan_Report.pdf",
+
+                    image: {
+                        type: "jpeg",
+                        quality: 1
+                    },
+
+                    html2canvas: {
+                        scale: 3
+                    },
+
+                    jsPDF: {
+                        unit: "mm",
+                        format: "a4",
+                        orientation: "portrait"
+                    },
+
+                    pagebreak: {
+                        mode: ["avoid-all", "css", "legacy"]
+                    }
+
+                })
+                .from(element)
+                .save();
+
+            toast.success("PDF downloaded.", {
+                id: "pdf"
+            });
+
+        } catch {
+
+            toast.error("Failed to generate PDF.", {
+                id: "pdf"
+            });
+
+        }
+
+    };
+
   // ✅ error state
   if (error || !result) {
     return (
@@ -253,9 +302,9 @@ const Results = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background" id="results-page">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 md:px-8 pt-24 pb-16">
+      <div className="container mx-auto px-4 md:px-8 pt-24 pb-16" id = "results-page" ref={reportRef}>
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <div className="w-14 h-14 rounded-2xl bg-green-100 flex items-center justify-center mx-auto mb-4">
@@ -313,8 +362,8 @@ const Results = () => {
           {/* Actions */}
           <div className="flex flex-wrap gap-3 justify-center">
 
-// this is the line to download as pdf.
-            <Button variant="outline" className="rounded-xl gap-2" onClick={() => toast("PDF download coming soon!")}>
+
+            <Button variant="outline" className="rounded-xl gap-2" onClick={downloadPDF}>
               <Download className="w-4 h-4" /> Download PDF 
             </Button>
 
