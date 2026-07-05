@@ -144,11 +144,10 @@ https://www.youtube.com/@robinhood75t
 #### ⭐ Support
 If you like this project, consider giving it a ⭐ on GitHub — it helps a lot!
 
-#### Coming Soon features - 
-1. Pricing
-2. Download as PDF
-3. Get PrintOut
-4. Our Own Generative AI
+#### Things to do - 
+1. Validation & sessions in auth.
+2. Payment gateway.
+3. DataBase Work.
 
 
 
