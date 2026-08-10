@@ -11,10 +11,37 @@ const register = async (req, res) => {
     try{
         const {email , password} = req.body;
 
+        // Validation of email
+        if(!email.includes('@')){
+            return res.status(400).json({message: "Please enter a valid email."})
+        }
+
+        const beforeAt = email.split('@')[0];
+
+        if(beforeAt.length < 64){
+            return res.status(400).json({message: "Email is not Valid."})
+        }
+
+        if(password.length < 8){
+            return res.status(400).json({message: "Password should be the combination of at least 8 characters,numbers & special characters."})
+        }
+        if(!/[A-Z]/.test(password)){
+            return res.status(400).json({message: "password needs an uppercase letter."})
+        }
+        if(!/[a-z]/.test(password)){
+            return res.status(400).json({message: "password needs a lowercase letter."})
+        }
+        if(!/[0-9]/.test(password)){
+            return res.status(400).json({message: "password needs a number."})
+        }
+        if (!/[!@#$%^&*]/.test(password)) {
+            return res.status(400).send("Password needs a special character");
+        }
         if(!email || !password){
             return res.status(400).json({message: "email and password are required"});
         }
 
+        
         const existingUser = await userModel.findOne({email});
         if(existingUser){
             return res.status(400).json({message: "user already exists"});
