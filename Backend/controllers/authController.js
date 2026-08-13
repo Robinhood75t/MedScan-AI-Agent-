@@ -11,6 +11,11 @@ const register = async (req, res) => {
     try{
         const {email , password} = req.body;
 
+
+        if(!email || !password){
+            return res.status(400).json({message: "email and password are required"});
+        }
+
         // Validation of email
         if(!email.includes('@')){
             return res.status(400).json({message: "Please enter a valid email."})
@@ -18,7 +23,7 @@ const register = async (req, res) => {
 
         const beforeAt = email.split('@')[0];
 
-        if(beforeAt.length < 64){
+        if(beforeAt.length >= 64){
             return res.status(400).json({message: "Email is not Valid."})
         }
 
@@ -37,9 +42,7 @@ const register = async (req, res) => {
         if (!/[!@#$%^&*]/.test(password)) {
             return res.status(400).send("Password needs a special character");
         }
-        if(!email || !password){
-            return res.status(400).json({message: "email and password are required"});
-        }
+        
 
         
         const existingUser = await userModel.findOne({email});
