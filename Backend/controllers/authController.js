@@ -108,7 +108,6 @@ const login = async (req, res) => {
         res.status(500).json({message: "internal server error"});
     }
 }
-
 //refresh token controller
 const refresh = async (req, res) => {
   try {
